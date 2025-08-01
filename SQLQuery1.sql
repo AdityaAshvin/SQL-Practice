@@ -39,6 +39,10 @@ WHERE Color IS NOT NULL
 
 -- 7. Write a query that generates the following result set  from Production.Product:
 
+SELECT Name, Color
+FROM Production.Product
+WHERE Color = 'Black' OR Color = 'Silver'
+
 SELECT TOP 6 Name, Color
 FROM Production.Product
 WHERE Color = 'Black' OR Color = 'Silver'
@@ -67,12 +71,22 @@ WHERE Name LIKE 'S%'
 
 -- 11. Write a query that retrieves the columns Name and ListPrice from the Production.Product table. Your result set should look something like the following. Order the result set by the Name column. 
 
+SELECT Name, ListPrice
+FROM Production.Product
+WHERE Name LIKE 'S%'
+ORDER BY Name
+
 SELECT TOP 6 Name, ListPrice
 FROM Production.Product
 WHERE Name LIKE 'S%'
 ORDER BY Name
 
 -- 12. Write a query that retrieves the columns Name and ListPrice from the Production.Product table. Your result set should look something like the following. Order the result set by the Name column. The products name should start with either 'A' or 'S'
+
+SELECT Name, ListPrice
+FROM Production.Product
+WHERE Name LIKE 'A%' OR Name LIKE 'S%'
+ORDER BY Name
 
 SELECT TOP 5 Name, ListPrice
 FROM Production.Product
