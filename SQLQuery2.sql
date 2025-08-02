@@ -65,8 +65,8 @@ GROUP BY Shelf, ProductID
 
 SELECT Color, Class, COUNT (ProductID) AS TheCount , AVG (ListPrice) AS AvgPrice
 FROM Production.Product
+WHERE Color IS NOT NULL AND Class IS NOT NULL
 GROUP BY Color, Class
-HAVING Color IS NOT NULL AND Class IS NOT NULL
 
 -- 12. Write a query that lists the country and province names from person. CountryRegion and person. StateProvince tables. Join them
 
@@ -117,4 +117,139 @@ WHERE o.ShipPostalCode IS NOT NULL AND o.OrderDate > DATEADD (YEAR, -27, GETDATE
 GROUP BY o.ShipPostalCode
 ORDER BY TheCount DESC
 
--- 17. 
+-- 17. List all city names and number of customers in that city
+
+SELECT c.City, COUNT (c.CustomerID) AS CustomerCount
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+GROUP BY c.City
+
+SELECT c.City, COUNT (c.CustomerID) AS CustomerCount
+FROM Customers c
+LEFT JOIN Orders o
+ON c.CustomerID = o.CustomerID
+GROUP BY c.City
+
+-- 18. List city names which have more than 2 customers, and number of customers in that city
+
+SELECT c.City, COUNT (c.CustomerID) AS CustomerCountMoreThan2
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+GROUP BY c.City
+HAVING COUNT (c.CustomerID) > 2
+
+-- 19. List the names of customers who placed orders after 1/1/98 with order date.
+
+SELECT DISTINCT c.ContactName
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+WHERE o.OrderDate > '1998-01-01'
+
+-- 20. List the names of all customers with most recent order dates
+
+SELECT c.ContactName, MAX (o.OrderDate) As MostRecentOrder
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.ContactName
+ORDER BY MostRecentOrder DESC
+
+SELECT DISTINCT c.ContactName, MAX (o.OrderDate) As MostRecentOrder
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.ContactName
+ORDER BY MostRecentOrder DESC
+
+-- 21. Display the names of all customers  along with the  count of products they bought
+
+SELECT c.ContactName,  COUNT (od.ProductID)
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+JOIN [Order Details] od
+ON od.OrderID = o.OrderID
+GROUP BY c.CustomerID, c.ContactName
+
+-- 22. Display the customer ids who bought more than 100 Products with count of products.
+
+SELECT c.CustomerID,  COUNT (od.ProductID)
+FROM Customers c
+JOIN Orders o
+ON c.CustomerID = o.CustomerID
+JOIN [Order Details] od
+ON od.OrderID = o.OrderID
+GROUP BY c.CustomerID
+HAVING COUNT (od.ProductID) > 100
+
+-- 23. List all of the possible ways that suppliers can ship their products. Display the results as below
+
+SELECT su.CompanyName, sh.CompanyName
+FROM Suppliers su
+CROSS JOIN Shippers sh
+
+-- 24. Display the products order each day. Show Order date and Product Name.
+
+SELECT o.OrderDate, p.ProductName
+FROM Orders o
+JOIN [Order Details] od
+ON o.OrderID = od.OrderID
+JOIN Products p
+ON p.ProductID = od.ProductID
+ORDER BY o.OrderDate DESC
+
+SELECT DISTINCT o.OrderDate, p.ProductName
+FROM Orders o
+JOIN [Order Details] od
+ON o.OrderID = od.OrderID
+JOIN Products p
+ON p.ProductID = od.ProductID
+ORDER BY o.OrderDate DESC
+
+-- 25. Displays pairs of employees who have the same job title.
+
+SELECT e1.FirstName + ' ' + e1.LastName AS Employee1, e2.FirstName + ' ' + e2.LastName AS Employee2, e1.Title, e2.Title
+FROM Employees e1
+JOIN Employees e2
+ON e1.Title = e2.Title
+WHERE e1.EmployeeID != e2.EmployeeID
+ORDER By e1.FirstName, e2.FirstName
+
+SELECT e1.FirstName + ' ' + e1.LastName AS Employee1, e2.FirstName + ' ' + e2.LastName AS Employee2, e1.Title, e2.Title
+FROM Employees e1
+JOIN Employees e2
+ON e1.Title = e2.Title
+WHERE e1.EmployeeID != e2.EmployeeID AND e1.EmployeeID > e2.EmployeeID
+ORDER By e1.FirstName, e2.FirstName
+
+-- 26.  Display all the Managers who have more than 2 employees reporting to them
+
+SELECT mng.FirstName + ' ' + mng.LastName AS Manager, emp.FirstName + ' ' + emp.LastName AS Employee
+FROM Employees emp
+JOIN Employees mng
+ON emp.ReportsTo = mng.EmployeeID
+ORDER BY mng.FirstName
+
+SELECT mng.FirstName + ' ' + mng.LastName AS Manager, COUNT (emp.EmployeeID)
+FROM Employees emp
+JOIN Employees mng
+ON emp.ReportsTo = mng.EmployeeID
+GROUP BY mng.FirstName, mng.LastName
+HAVING COUNT (emp.EmployeeID) > 2
+
+-- 27. Display the customers and suppliers by city. The results should have the following columns
+
+SELECT c.City, c.CompanyName, 'Customer' AS Type
+FROM Customers c
+UNION 
+SELECT s.City, s.CompanyName, 'Supplier' AS Type
+FROM Suppliers s
+
+SELECT c.City, c.CompanyName, 'Customer' AS Type
+FROM Customers c
+UNION ALL
+SELECT s.City, s.CompanyName, 'Supplier' AS Type
+FROM Suppliers s
